@@ -13,7 +13,7 @@
     using GrpcNet.Abstractions;
 
     internal sealed class GrpcNetServer<
-#if !NETSTANDARD
+#if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)]
 #endif
     T> : IGrpcNetServer<T>, IAsyncDisposable
@@ -38,13 +38,6 @@
             _app = null;
             _networkPort = port;
             _host = host;
-        }
-        public GrpcNetServer(
-            ILogger<GrpcNetServer<T>> logger,
-            T instance,
-            ITransportListener listener,
-            bool loopbackOnly) : this(logger, instance, listener, 0, loopbackOnly ? IPAddress.Loopback.ToString() : IPAddress.Any.ToString())
-        {
         }
 
         public GrpcNetServer(

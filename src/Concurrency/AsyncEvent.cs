@@ -33,7 +33,7 @@
         /// <inheritdoc />
         public void Add(Func<CancellationToken, Task> handler)
         {
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (handler is null)
                 throw new ArgumentNullException(nameof(handler));
 #else
@@ -46,7 +46,7 @@
         /// <inheritdoc />
         public async Task AddAsync(Func<CancellationToken, Task> handler)
         {
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (handler is null)
                 throw new ArgumentNullException(nameof(handler));
 #else
@@ -59,7 +59,7 @@
         /// <inheritdoc />
         public void Remove(Func<CancellationToken, Task> handler)
         {
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (handler is null)
                 throw new ArgumentNullException(nameof(handler));
 #else
@@ -72,7 +72,7 @@
         /// <inheritdoc />
         public async Task RemoveAsync(Func<CancellationToken, Task> handler)
         {
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (handler is null)
                 throw new ArgumentNullException(nameof(handler));
 #else
@@ -133,7 +133,7 @@
         /// <inheritdoc />
         public void Add(Func<TArgs, CancellationToken, Task> handler)
         {
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (handler is null)
                 throw new ArgumentNullException(nameof(handler));
 #else
@@ -146,7 +146,7 @@
         /// <inheritdoc />
         public async Task AddAsync(Func<TArgs, CancellationToken, Task> handler)
         {
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (handler is null)
                 throw new ArgumentNullException(nameof(handler));
 #else
@@ -159,7 +159,7 @@
         /// <inheritdoc />
         public void Remove(Func<TArgs, CancellationToken, Task> handler)
         {
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (handler is null)
                 throw new ArgumentNullException(nameof(handler));
 #else
@@ -172,7 +172,7 @@
         /// <inheritdoc />
         public async Task RemoveAsync(Func<TArgs, CancellationToken, Task> handler)
         {
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (handler is null)
                 throw new ArgumentNullException(nameof(handler));
 #else

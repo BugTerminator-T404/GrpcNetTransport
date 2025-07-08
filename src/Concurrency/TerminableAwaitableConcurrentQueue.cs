@@ -84,7 +84,7 @@
         /// <param name="cancellationToken">The cancellation token to cancel the dequeue operation.</param>
         /// <returns>The item that was dequeued.</returns>
         public async ValueTask<(
-#if NETSTANDARD
+#if !NETCOREAPP3_0_OR_GREATER
             T item,
 #else
             T? item,
@@ -117,7 +117,7 @@
         {
             private readonly TerminableAwaitableConcurrentQueue<T> _queue;
             private readonly CancellationToken _cancellationToken;
-#if NETSTANDARD
+#if !NETCOREAPP3_0_OR_GREATER
             private T _current;
 #else
             private T? _current;
@@ -140,7 +140,7 @@
 
             public ValueTask DisposeAsync()
             {
-#if NETSTANDARD
+#if !NET5_0_OR_GREATER
                 return default;
 #else
                 return ValueTask.CompletedTask;

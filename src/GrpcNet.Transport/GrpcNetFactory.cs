@@ -34,46 +34,32 @@
         }
 
         IGrpcNetServer<T> IGrpcNetFactory.CreateNetworkServer<
-#if !NETSTANDARD
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)]
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)] 
 #endif
             T>(
-            T instance, ITransportListener listener, bool loopbackOnly) where T : class
+            T instance, ITransportListener listener, bool loopbackOnly = false, int networkPort = 0) where T : class
         {
             return new GrpcNetServer<T>(
                 _serviceProvider?.GetRequiredService<ILogger<GrpcNetServer<T>>>(),
                 instance,
                 listener,
+                networkPort,
                 loopbackOnly);
         }
 
         IGrpcNetServer<T> IGrpcNetFactory.CreateNetworkServer<
-#if !NETSTANDARD
+#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)] 
 #endif
             T>(
-            T instance, ITransportListener listener, int port, bool loopbackOnly) where T : class
+            T instance, ITransportListener listener, string host, int networkPort = 0) where T : class
         {
             return new GrpcNetServer<T>(
                 _serviceProvider?.GetRequiredService<ILogger<GrpcNetServer<T>>>(),
                 instance,
                 listener,
-                port,
-                loopbackOnly);
-        }
-
-        IGrpcNetServer<T> IGrpcNetFactory.CreateNetworkServer<
-#if !NETSTANDARD
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)] 
-#endif
-            T>(
-            T instance, ITransportListener listener, int port, string host) where T : class
-        {
-            return new GrpcNetServer<T>(
-                _serviceProvider?.GetRequiredService<ILogger<GrpcNetServer<T>>>(),
-                instance,
-                listener,
-                port,
+                networkPort,
                 host);
         }
 

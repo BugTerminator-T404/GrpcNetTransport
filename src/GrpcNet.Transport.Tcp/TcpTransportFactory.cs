@@ -15,7 +15,7 @@ namespace GrpcNet.Transport.Tcp
         {
             var client = new TcpClient();
             await client.ConnectAsync(
-#if !NETSTANDARD
+#if NET6_0_OR_GREATER
                 endpoint
                 , cancellationToken
 #else

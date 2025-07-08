@@ -13,13 +13,13 @@ namespace GrpcNet.Transport.Tcp
     {
 
         public TcpListener? _listener;
-		
+
         public bool NoDelay { get => _listener!.Server.NoDelay; set => _listener!.Server.NoDelay = value; }
 
         public async Task<ITransportAdapter> AcceptAsync(CancellationToken cancellationToken = default)
         {
             var transport = await _listener.AcceptTcpClientAsync(
-#if  !NETSTANDARD
+#if  NET6_0_OR_GREATER
                 cancellationToken
 #endif
                 );
@@ -28,7 +28,7 @@ namespace GrpcNet.Transport.Tcp
 
         public void Dispose()
         {
-#if !NETSTANDARD
+#if  NET6_0_OR_GREATER
             _listener?.Dispose();
 #else
             _listener = null;
@@ -37,7 +37,7 @@ namespace GrpcNet.Transport.Tcp
 
         public ValueTask DisposeAsync()
         {
-#if !NETSTANDARD
+#if  NET6_0_OR_GREATER
             _listener?.Dispose();
             return ValueTask.CompletedTask;
 #else

@@ -301,7 +301,7 @@
             Method<TRequest, TResponse> method,
             UnaryServerMethod<TRequest, TResponse> handler)
         {
-#if !NETSTANDARD
+#if NET6_0_OR_GREATER
             ArgumentNullException.ThrowIfNull(method);
 #else
             if (method is null)
@@ -320,10 +320,10 @@
             Method<TRequest, TResponse> method,
             ClientStreamingServerMethod<TRequest, TResponse> handler)
         {
-#if !NETSTANDARD
+#if NET6_0_OR_GREATER
             ArgumentNullException.ThrowIfNull(method);
 #else
-            if (method is null) 
+            if (method is null)
                 throw new ArgumentNullException(nameof(method));
 #endif
             _callHandlers[method.FullName] = async (incomingCall) =>
@@ -339,7 +339,7 @@
             Method<TRequest, TResponse> method,
             ServerStreamingServerMethod<TRequest, TResponse> handler)
         {
-#if !NETSTANDARD
+#if NET6_0_OR_GREATER
             ArgumentNullException.ThrowIfNull(method);
 #else
             if (method is null)
@@ -358,7 +358,7 @@
             Method<TRequest, TResponse> method,
             DuplexStreamingServerMethod<TRequest, TResponse> handler)
         {
-#if !NETSTANDARD
+#if NET6_0_OR_GREATER
             ArgumentNullException.ThrowIfNull(method);
 #else
             if (method is null)
@@ -373,6 +373,6 @@
             };
         }
 
-#endregion
+        #endregion
     }
 }

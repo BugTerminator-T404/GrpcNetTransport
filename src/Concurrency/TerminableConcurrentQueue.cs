@@ -91,7 +91,7 @@
         private sealed class Enumerator : IEnumerator<T>
         {
             private readonly TerminableConcurrentQueue<T> _queue;
-#if NETSTANDARD
+#if !NETCOREAPP3_0_OR_GREATER
             private T _current;
 #else
             private T? _current;

@@ -431,7 +431,7 @@
                 throw new RpcException(_responseStatus.Value);
             }
 
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (_connection == null)
                 new ObjectDisposedException(nameof(GrpcClientCall<TRequest, TResponse>));
 #else
@@ -476,7 +476,7 @@
 
                 throw new RpcException(_responseStatus.Value);
             }
-#if NETSTANDARD
+#if !NET6_0_OR_GREATER
             if (_connection == null)
                 new ObjectDisposedException(nameof(GrpcClientCall<TRequest, TResponse>));
 #else
@@ -502,7 +502,7 @@
             }
         }
 
-#endregion
+        #endregion
 
         #region IAsyncStreamReader<TResponse>
 

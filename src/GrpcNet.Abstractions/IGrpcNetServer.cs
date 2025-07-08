@@ -10,7 +10,7 @@
     /// </summary>
     /// <typeparam name="T">The gRPC server type.</typeparam>
     public interface IGrpcNetServer<
-#if !NETSTANDARD
+#if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)]
 #endif
         T> : IAsyncDisposable where T : class

@@ -11,7 +11,7 @@
     using System.Net.Sockets;
     using System.Threading.Tasks;
     using GrpcNet.Abstractions;
-#if NETSTANDARD
+#if !NET7_0_OR_GREATER
     using System.IO.Shims;
 #endif
     internal class GrpcTransportConnection : IAsyncDisposable
@@ -104,7 +104,8 @@
             catch (IOException ex) when (
                 ex.InnerException is SocketException se &&
                 (se.SocketErrorCode == SocketError.ConnectionAborted ||
-                 se.SocketErrorCode == SocketError.ConnectionReset))
+                 se.SocketErrorCode == SocketError.ConnectionReset ||
+                 se.SocketErrorCode == SocketError.OperationAborted))
             {
                 throw new RpcException(new Status(StatusCode.Unavailable, "The remote host closed the connection."));
             }

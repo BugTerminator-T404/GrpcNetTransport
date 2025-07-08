@@ -60,7 +60,7 @@
         {
             private readonly AwaitableConcurrentQueue<T> _queue;
             private readonly CancellationToken _cancellationToken;
-#if NETSTANDARD
+#if !NETCOREAPP3_0_OR_GREATER
             private T _current;
 #else
             private T? _current;
@@ -83,7 +83,7 @@
 
             public ValueTask DisposeAsync()
             {
-#if NETSTANDARD
+#if !NET5_0_OR_GREATER
                 return default;
 #else
                 return ValueTask.CompletedTask;
