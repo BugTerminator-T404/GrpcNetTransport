@@ -5,6 +5,7 @@
     using System;
     using System.Data.Common;
     using System.Threading;
+    using System.Threading.Tasks;
 
     internal class GrpcServerCall<TRequest, TResponse>
         : IServerStreamWriter<TResponse>

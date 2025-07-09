@@ -1,14 +1,14 @@
-﻿using GrpcNet.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GrpcNet.Transport.Tcp
+﻿namespace GrpcNet.Transport.Tcp
 {
+    using GrpcNet.Abstractions;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Text;
+    using System.Threading.Tasks;
     public class TcpTransportAdapter : ITransportAdapter
     {
         private readonly TcpClient _tcp;

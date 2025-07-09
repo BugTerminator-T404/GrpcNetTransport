@@ -1,8 +1,9 @@
 ﻿namespace Concurrency
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
-
+    using System.Threading.Tasks;
     /// <summary>
     /// A wrapper around <see cref="SemaphoreSlim"/> that does not require calling
     /// <see cref="SemaphoreSlim.Dispose()"/> because it does not expose an unmanaged

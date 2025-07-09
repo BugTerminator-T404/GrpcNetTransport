@@ -1,16 +1,18 @@
 ﻿namespace GrpcNet.Transport
 {
-    using Microsoft.Extensions.Logging;
-    using GrpcNet.Transport.Impl;
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Net.Sockets;
-    using System.Net;
-    using System.Threading.Tasks;
-    using System.Reflection;
     using Grpc.Core;
     using GrpcNet;
     using GrpcNet.Abstractions;
+    using GrpcNet.Transport.Impl;
+    using Microsoft.Extensions.Logging;
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Reflection;
+    using System.Threading.Tasks;
 
     internal sealed class GrpcNetServer<
 #if NET5_0_OR_GREATER
@@ -21,53 +23,61 @@
     {
         private readonly T _instance;
         private readonly ILogger<GrpcNetServer<T>> _logger;
-        private GrpcServer? _app;
+        private GrpcServer? _grpcServer;
         private int _networkPort;
-        private string _host;
+        private IPAddress _hostAdress;
         readonly ITransportListener _listener;
         public GrpcNetServer(
             ILogger<GrpcNetServer<T>> logger,
             T instance,
             ITransportListener listener,
-            int port,
-            string host)
+            string host,
+            int port) : this(logger, instance, listener, IPAddress.Parse(host), port)
         {
-            _logger = logger;
-            _instance = instance;
-            _listener = listener;
-            _app = null;
-            _networkPort = port;
-            _host = host;
+
         }
 
         public GrpcNetServer(
             ILogger<GrpcNetServer<T>> logger,
             T instance,
             ITransportListener listener,
-            int port,
-            bool loopbackOnly) : this(logger, instance, listener, port, loopbackOnly ? IPAddress.Loopback.ToString() : IPAddress.Any.ToString())
+            bool loopbackOnly,
+            int port) : this(logger, instance, listener, loopbackOnly ? IPAddress.Loopback : IPAddress.Any, port)
         {
         }
 
-
+        public GrpcNetServer(
+        ILogger<GrpcNetServer<T>> logger,
+        T instance,
+        ITransportListener listener,
+        IPAddress address,
+        int port)
+        {
+            _logger = logger;
+            _instance = instance;
+            _listener = listener;
+            _grpcServer = null;
+            _hostAdress = address;
+            _networkPort = port;
+        }
 
         public async Task StartAsync()
         {
-            if (_app != null)
+            if (_grpcServer != null)
             {
                 return;
             }
 
             do
             {
-                GrpcServer? app = null;
+                GrpcServer? grpcServer = null;
                 try
                 {
                     //GrpcPipeLog.GrpcServerStarting(_logger);
 
-                    var endpoint = new IPEndPoint(IPAddress.Parse(_host), _networkPort);
+                    var endpoint = new IPEndPoint(_hostAdress, _networkPort);
                     await _listener.ListenAsync(endpoint).ConfigureAwait(false);
-                    app = new GrpcServer(_listener, _logger);
+                    grpcServer = new GrpcServer(_listener, _logger);
                     var binderAttr = typeof(T).GetCustomAttribute<BindServiceMethodAttribute>();
                     if (binderAttr == null)
                     {
@@ -80,9 +90,13 @@
                     var binder = targetMethods
                         .Where(x => x.Name == binderAttr.BindMethodName && x.GetParameters().Length == 2)
                         .First();
-                    binder.Invoke(null, BindingFlags.DoNotWrapExceptions, null, [app, _instance], null);
+#if !NET5_0_OR_GREATER
+                    binder.Invoke(null, BindingFlags.DoNotWrapExceptions, null, new Object[] { grpcServer, _instance }, null);
+#else
+                    binder.Invoke(null, BindingFlags.DoNotWrapExceptions, null, [grpcServer, _instance], null);
+#endif
 
-                    _app = app;
+                    _grpcServer = grpcServer;
                     return;
                 }
                 catch (IOException ex) when ((
@@ -90,10 +104,10 @@
                     ex.Message.Contains("used by another process", StringComparison.OrdinalIgnoreCase)))
                 {
 
-                    if (app != null)
+                    if (grpcServer != null)
                     {
-                        await app.DisposeAsync().ConfigureAwait(false);
-                        app = null;
+                        await grpcServer.DisposeAsync().ConfigureAwait(false);
+                        grpcServer = null;
                     }
                     continue;
                 }
@@ -103,10 +117,10 @@
         public async Task StopAsync()
         {
 
-            if (_app != null)
+            if (_grpcServer != null)
             {
-                await _app.DisposeAsync().ConfigureAwait(false);
-                _app = null;
+                await _grpcServer.DisposeAsync().ConfigureAwait(false);
+                _grpcServer = null;
             }
         }
 
@@ -115,7 +129,12 @@
             await StopAsync().ConfigureAwait(false);
         }
 
-        public ServiceBinderBase? ServiceBinder => _app;
+        public void Dispose()
+        {
+            DisposeAsync().GetAwaiter().GetResult();
+        }
+
+        public ServiceBinderBase? ServiceBinder => _grpcServer;
 
         public int NetworkPort
         {

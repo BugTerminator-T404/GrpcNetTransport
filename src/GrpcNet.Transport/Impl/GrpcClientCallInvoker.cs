@@ -3,6 +3,7 @@
     using Grpc.Core;
     using GrpcNet.Abstractions;
     using Microsoft.Extensions.Logging;
+    using System;
     using System.Net;
 
     internal sealed class GrpcClientCallInvoker : CallInvoker

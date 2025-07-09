@@ -6,11 +6,12 @@
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using static System.Collections.Specialized.BitVector32;
 
 #if !NET6_0_OR_GREATER
-    using Parallel = ParallelShims;
+    using Parallel = System.Threading.Tasks.ParallelShims;
 #endif
     /// <summary>
     /// Represents an asynchronous, broadcastable event where the broadcast

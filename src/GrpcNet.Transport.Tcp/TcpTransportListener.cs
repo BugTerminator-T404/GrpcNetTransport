@@ -1,19 +1,15 @@
-﻿using GrpcNet.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GrpcNet.Transport.Tcp
+﻿namespace GrpcNet.Transport.Tcp
 {
+    using GrpcNet.Abstractions;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Threading;
+    using System.Threading.Tasks;
     public class TcpTransportListener : ITransportListener
     {
 
         public TcpListener? _listener;
-
+		
         public bool NoDelay { get => _listener!.Server.NoDelay; set => _listener!.Server.NoDelay = value; }
 
         public async Task<ITransportAdapter> AcceptAsync(CancellationToken cancellationToken = default)
@@ -28,7 +24,7 @@ namespace GrpcNet.Transport.Tcp
 
         public void Dispose()
         {
-#if  NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER
             _listener?.Dispose();
 #else
             _listener = null;
@@ -37,7 +33,7 @@ namespace GrpcNet.Transport.Tcp
 
         public ValueTask DisposeAsync()
         {
-#if  NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER
             _listener?.Dispose();
             return ValueTask.CompletedTask;
 #else

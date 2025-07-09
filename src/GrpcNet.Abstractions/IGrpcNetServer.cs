@@ -13,7 +13,7 @@
 #if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)]
 #endif
-        T> : IAsyncDisposable where T : class
+        T> : IDisposable, IAsyncDisposable where T : class
     {
         /// <summary>
         /// Starts the gRPC server.

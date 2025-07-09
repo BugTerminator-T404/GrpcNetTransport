@@ -56,6 +56,22 @@
             T instance, ITransportListener listener, string host, int networkPort = 0) where T : class;
 
         /// <summary>
+        /// Construct a gRPC server that provides services on a specified IP address
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="instance"></param>
+        /// <param name="listener"></param>
+        /// <param name="host"></param>
+        /// <param name="networkPort"></param>
+        /// <returns></returns>
+        IGrpcNetServer<T> CreateNetworkServer<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)]
+#endif
+        T>(
+            T instance, ITransportListener listener, IPAddress host, int networkPort = 0) where T : class;
+
+        /// <summary>
         /// Creates a gRPC client that connects to services on the local network.
         /// </summary>
         /// <typeparam name="T">The gRPC client type.</typeparam>

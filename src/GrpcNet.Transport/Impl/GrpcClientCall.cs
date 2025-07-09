@@ -7,7 +7,9 @@
     using System.Net;
     using System.Threading.Tasks;
     using GrpcNet.Abstractions;
-
+    using System.Threading;
+    using Mutex = Concurrency.Mutex;
+    using Semaphore = Concurrency.Semaphore;
     internal class GrpcClientCall<TRequest, TResponse>
         : IClientStreamWriter<TRequest>
         , IAsyncStreamReader<TResponse>
@@ -431,7 +433,7 @@
                 throw new RpcException(_responseStatus.Value);
             }
 
-#if !NET6_0_OR_GREATER
+#if !NET7_0_OR_GREATER
             if (_connection == null)
                 new ObjectDisposedException(nameof(GrpcClientCall<TRequest, TResponse>));
 #else
@@ -476,7 +478,7 @@
 
                 throw new RpcException(_responseStatus.Value);
             }
-#if !NET6_0_OR_GREATER
+#if !NET7_0_OR_GREATER
             if (_connection == null)
                 new ObjectDisposedException(nameof(GrpcClientCall<TRequest, TResponse>));
 #else

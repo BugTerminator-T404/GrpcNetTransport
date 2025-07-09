@@ -44,8 +44,8 @@
                 _serviceProvider?.GetRequiredService<ILogger<GrpcNetServer<T>>>(),
                 instance,
                 listener,
-                networkPort,
-                loopbackOnly);
+                loopbackOnly,
+                networkPort);
         }
 
         IGrpcNetServer<T> IGrpcNetFactory.CreateNetworkServer<
@@ -59,8 +59,23 @@
                 _serviceProvider?.GetRequiredService<ILogger<GrpcNetServer<T>>>(),
                 instance,
                 listener,
-                networkPort,
-                host);
+                host,
+                networkPort);
+        }
+
+        IGrpcNetServer<T> IGrpcNetFactory.CreateNetworkServer<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)] 
+#endif
+            T>(
+            T instance, ITransportListener listener, IPAddress host, int networkPort = 0) where T : class
+        {
+            return new GrpcNetServer<T>(
+                _serviceProvider?.GetRequiredService<ILogger<GrpcNetServer<T>>>(),
+                instance,
+                listener,
+                host,
+                networkPort);
         }
 
         T IGrpcNetFactory.CreateNetworkClient<T>(

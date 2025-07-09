@@ -11,9 +11,8 @@
     using System.Net.Sockets;
     using System.Threading.Tasks;
     using GrpcNet.Abstractions;
-#if !NET7_0_OR_GREATER
-    using System.IO.Shims;
-#endif
+    using System.IO;
+    using System.Threading;
     internal class GrpcTransportConnection : IAsyncDisposable
     {
         private readonly Stream _networkStream;
@@ -240,7 +239,10 @@
                     dataBuffer.Dispose();
                     throw;
                 }
-                ArrayPool<byte>.Shared.Return(lengthBuffer);
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(lengthBuffer);
+                }
             }).ConfigureAwait(false);
         }
 

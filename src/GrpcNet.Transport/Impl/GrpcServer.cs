@@ -9,6 +9,9 @@
     using System.Net.Sockets;
     using System.Threading.Tasks;
     using GrpcNet.Abstractions;
+    using System.Threading;
+    using System.Linq;
+    using Mutex = Concurrency.Mutex;
 
     internal sealed class GrpcServer : ServiceBinderBase, IAsyncDisposable
     {
@@ -23,7 +26,12 @@
 
         private class TrackedCall
         {
-            public required ITransportAdapter Client;
+            public
+#if NET6_0_OR_GREATER
+            required
+#endif
+            ITransportAdapter Client;
+
             public Task? Task;
         }
 

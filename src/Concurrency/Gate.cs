@@ -1,5 +1,11 @@
-﻿namespace Concurrency
+﻿
+
+namespace Concurrency
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Implements a gate, which prevents logic from proceeding until the gate is opened.
     /// </summary>

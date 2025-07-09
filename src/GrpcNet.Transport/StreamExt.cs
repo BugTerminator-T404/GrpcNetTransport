@@ -5,13 +5,11 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable PartialTypeWithSinglePart
 
-using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-namespace System.IO.Shims
+namespace System.IO
 {
-    internal static partial class PolyfillExtensions
+    internal static partial class StreamExt
     {
         // Signature-compatible replacement for ReadAtLeast(Span<byte>, ...)
         // https://learn.microsoft.com/en-us/dotnet/api/system.io.stream.readatleast
