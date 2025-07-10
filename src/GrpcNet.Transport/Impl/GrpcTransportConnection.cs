@@ -24,7 +24,6 @@
         private bool _readInterrupted;
         private bool _writeInterrupted;
         private bool _disposed;
-        private readonly ITransportFactory _transportFactory;
         public static async Task<GrpcTransportConnection> ConnectAsync(
             IPEndPoint endpoint,
             ITransportFactory transportFactory,
@@ -138,16 +137,15 @@
             await OpWithExceptionHandling(OpMode.Write, async () =>
             {
                 var length = value.CalculateSize();
-                //var lengthBuffer = new byte[sizeof(int)];
                 var lengthBuffer = ArrayPool<byte>.Shared.Rent(sizeof(int));
                 using var dataBuffer = MemoryPool<byte>.Shared.Rent(length);
                 BinaryPrimitives.WriteInt32BigEndian(lengthBuffer, length);
                 value.WriteTo(dataBuffer.Memory.Span.Slice(0, length));
                 LogTrace($"Start write of {typeof(T).Name} with length {length}.");
                 await _networkStream.WriteAsync(lengthBuffer, cancellationToken).ConfigureAwait(false);
+                ArrayPool<byte>.Shared.Return(lengthBuffer);
                 await _networkStream.WriteAsync(dataBuffer.Memory.Slice(0, length), cancellationToken).ConfigureAwait(false);
                 LogTrace($"End write of {typeof(T).Name} with length {length}.");
-                ArrayPool<byte>.Shared.Return(lengthBuffer);
                 return 0;
             }).ConfigureAwait(false);
         }
@@ -159,14 +157,13 @@
             await OpWithExceptionHandling(OpMode.Write, async () =>
             {
                 var length = value.Length;
-                //var lengthBuffer = new byte[sizeof(int)];
                 var lengthBuffer = ArrayPool<byte>.Shared.Rent(sizeof(int));
                 BinaryPrimitives.WriteInt32BigEndian(lengthBuffer, length);
                 LogTrace($"Start write of blob with length {length}.");
                 await _networkStream.WriteAsync(lengthBuffer, cancellationToken).ConfigureAwait(false);
+                ArrayPool<byte>.Shared.Return(lengthBuffer);
                 await _networkStream.WriteAsync(value, cancellationToken).ConfigureAwait(false);
                 LogTrace($"End write of blob with length {length}.");
-                ArrayPool<byte>.Shared.Return(lengthBuffer);
                 return 0;
             }).ConfigureAwait(false);
         }
@@ -179,15 +176,14 @@
 
             return await OpWithExceptionHandling(OpMode.Read, async () =>
             {
-                //var lengthBuffer = new byte[sizeof(int)];
                 var lengthBuffer = ArrayPool<byte>.Shared.Rent(sizeof(int));
                 await _networkStream.ReadExactlyAsync(lengthBuffer, cancellationToken).ConfigureAwait(false);
                 var length = BinaryPrimitives.ReadInt32BigEndian(lengthBuffer);
+                ArrayPool<byte>.Shared.Return(lengthBuffer);
                 LogTrace($"Start read of {typeof(T).Name} with length {length}.");
                 using var dataBuffer = MemoryPool<byte>.Shared.Rent(length);
                 await _networkStream.ReadExactlyAsync(dataBuffer.Memory.Slice(0, length), cancellationToken).ConfigureAwait(false);
                 LogTrace($"End read of {typeof(T).Name} with length {length}.");
-                ArrayPool<byte>.Shared.Return(lengthBuffer);
                 return (T)descriptor.Parser.ParseFrom(dataBuffer.Memory.Span.Slice(0, length));
             }).ConfigureAwait(false);
         }
@@ -220,10 +216,10 @@
 
             return await OpWithExceptionHandling(OpMode.Read, async () =>
             {
-                //var lengthBuffer = new byte[sizeof(int)];
                 var lengthBuffer = ArrayPool<byte>.Shared.Rent(sizeof(int));
                 await _networkStream.ReadExactlyAsync(lengthBuffer, cancellationToken).ConfigureAwait(false);
                 var length = BinaryPrimitives.ReadInt32BigEndian(lengthBuffer);
+                ArrayPool<byte>.Shared.Return(lengthBuffer);
                 LogTrace($"Start read of blob with length {length}.");
                 var dataBuffer = MemoryPool<byte>.Shared.Rent(length);
                 try
@@ -238,10 +234,6 @@
                 {
                     dataBuffer.Dispose();
                     throw;
-                }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(lengthBuffer);
                 }
             }).ConfigureAwait(false);
         }
